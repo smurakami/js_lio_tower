@@ -11,7 +11,7 @@
     GAME_WIDTH = 320;
     GAME_HEIGHT = 320;
     GRAVITY = 20;
-    BOUNCE = 0.30;
+    BOUNCE = 0.01;
     LIO_DEFAULT_Y = 20;
     lio = null;
     lio_imgs = [
@@ -32,7 +32,7 @@
         }
         img_num = 0;
         img = lio_imgs[img_num];
-        PhyBoxSprite.call(this, img.width, img.height, DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, false);
+        PhyBoxSprite.call(this, img.width, img.height, enchant.box2d.DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, false);
         this.image = game.assets[img.url];
         this.position = {
           x: x,
@@ -44,7 +44,7 @@
     });
     Floor = enchant.Class.create(PhyBoxSprite, {
       initialize: function() {
-        PhyBoxSprite.call(this, GAME_WIDTH - 20, 20, STATIC_SPRITE, 1.0, 1.0, 0.0, true);
+        PhyBoxSprite.call(this, GAME_WIDTH - 20, 20, enchant.box2d.STATIC_SPRITE, 1.0, 1.0, 0.0, true);
         this.x = 10;
         this.y = GAME_HEIGHT - this.height;
         this.backgroundColor = "green";
@@ -52,7 +52,7 @@
       }
     });
     game = enchant.Core(GAME_WIDTH, GAME_HEIGHT);
-    game.fps = 60;
+    game.fps = 30;
     game.rootScene.backgroundColor = "aqua";
     for (_i = 0, _len = lio_imgs.length; _i < _len; _i++) {
       img = lio_imgs[_i];

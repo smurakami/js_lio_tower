@@ -5,7 +5,7 @@ window.onload = ->
     GAME_WIDTH  = 320
     GAME_HEIGHT = 320
     GRAVITY = 20 # 重力
-    BOUNCE = 0.30 # 跳ね返り係数
+    BOUNCE = 0.01 # 跳ね返り係数
     LIO_DEFAULT_Y = 20 # 最初のy座標
     lio = null # 操作対象のlio
 
@@ -19,7 +19,7 @@ window.onload = ->
         initialize: (x = GAME_WIDTH / 2, y = GAME_HEIGHT / 2) ->
             img_num = 0
             img = lio_imgs[img_num]
-            PhyBoxSprite.call this,img.width , img.height, DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, no
+            PhyBoxSprite.call this,img.width , img.height, enchant.box2d.DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, no
 
             # this.image = img.url
             this.image = game.assets[img.url]
@@ -35,7 +35,7 @@ window.onload = ->
 
     Floor = enchant.Class.create PhyBoxSprite,
         initialize: ->
-            PhyBoxSprite.call this, GAME_WIDTH - 20, 20, STATIC_SPRITE, 1.0, 1.0, 0.0, true
+            PhyBoxSprite.call this, GAME_WIDTH - 20, 20, enchant.box2d.STATIC_SPRITE, 1.0, 1.0, 0.0, true
 
             this.x = 10;
             this.y = GAME_HEIGHT - this.height
@@ -45,7 +45,7 @@ window.onload = ->
 
     # game のセットアップ
     game = enchant.Core GAME_WIDTH, GAME_HEIGHT
-    game.fps = 60
+    game.fps = 30
     game.rootScene.backgroundColor = "aqua"
     # 画像のロード
     for img in lio_imgs
