@@ -7,7 +7,7 @@
   global = this;
 
   window.onload = function() {
-    var BOUNCE, Floor, GAME_HEIGHT, GAME_WIDTH, GRAVITY, LIO_DEFAULT_Y, Lio, MAX_LIO_NUM, Score, game, game_is_over, game_over, img, lio, lio_imgs, lio_vertex, score, _i, _len;
+    var BOUNCE, Cloud, Floor, GAME_HEIGHT, GAME_WIDTH, GRAVITY, LIO_DEFAULT_Y, Lio, MAX_LIO_NUM, Score, Sun, game, game_is_over, game_over, img, lio, lio_imgs, lio_vertex, score, _i, _len;
     GAME_WIDTH = 320;
     GAME_HEIGHT = 320;
     GRAVITY = 5;
@@ -260,6 +260,33 @@
         }
       }
     });
+    Sun = enchant.Class.create(enchant.Sprite, {
+      initialize: function() {
+        enchant.Sprite.call(this, 100, 100);
+        this.x = GAME_WIDTH - 130;
+        this.y = -40;
+        this.image = game.assets['img/sun.png'];
+        this.addEventListener("enterframe", function() {
+          return this.rotate(0.4);
+        });
+        return game.rootScene.addChild(this);
+      }
+    });
+    Cloud = enchant.Class.create(enchant.Sprite, {
+      initialize: function() {
+        enchant.Sprite.call(this, 120, 100);
+        this.x = GAME_WIDTH;
+        this.y = 0;
+        this.image = game.assets['img/cloud.png'];
+        this.addEventListener("enterframe", function() {
+          this.x -= 0.15;
+          if (this.x < -this.width) {
+            return this.x = GAME_WIDTH;
+          }
+        });
+        return game.rootScene.addChild(this);
+      }
+    });
     Floor = enchant.Class.create(PhyBoxSprite, {
       initialize: function() {
         var cover;
@@ -277,15 +304,15 @@
     });
     Score = enchant.Class.create(enchant.Label, {
       initialize: function() {
-        enchant.Label.call(this, "0 匹");
+        enchant.Label.call(this, "0");
         this.num = 0;
-        this.x = GAME_WIDTH - 50;
+        this.x = 30;
         this.y = 10;
         return game.rootScene.addChild(this);
       },
       gain: function() {
         this.num++;
-        return this.text = "" + this.num + " 匹";
+        return this.text = "" + this.num;
       }
     });
     game = new Game(GAME_WIDTH, GAME_HEIGHT);
@@ -295,6 +322,8 @@
       img = lio_imgs[_i];
       game.preload(img.url);
     }
+    game.preload("img/sun.png");
+    game.preload("img/cloud.png");
     game_over = function() {
       game_is_over = true;
       game.rootScene.clearEventListener();
@@ -303,6 +332,8 @@
     game.onload = function() {
       var world;
       world = new PhysicsWorld(0.0, GRAVITY);
+      new Sun;
+      new Cloud;
       new Floor;
       score = new Score;
       setTimeout(function() {

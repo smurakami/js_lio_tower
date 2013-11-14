@@ -117,6 +117,33 @@ window.onload = ->
             if this.y > GAME_HEIGHT
                 game_over()
 
+    # -----------
+    # 太陽
+    # -----------
+    Sun = enchant.Class.create enchant.Sprite,
+        initialize: ->
+            enchant.Sprite.call this, 100, 100
+            this.x = GAME_WIDTH - 130
+            this.y = -40
+            this.image = game.assets['img/sun.png']
+            this.addEventListener "enterframe", ->
+                this.rotate 0.4
+            game.rootScene.addChild this
+
+    # -----------
+    # 雲
+    # -----------
+    Cloud = enchant.Class.create enchant.Sprite,
+        initialize: ->
+            enchant.Sprite.call this, 120, 100
+            this.x = GAME_WIDTH
+            this.y = 0
+            this.image = game.assets['img/cloud.png']
+            this.addEventListener "enterframe", ->
+                this.x -= 0.15
+                if this.x < -this.width
+                    this.x = GAME_WIDTH
+            game.rootScene.addChild this
 
     # -----------
     # 床
@@ -143,14 +170,14 @@ window.onload = ->
 
     Score = enchant.Class.create enchant.Label,
         initialize: ->
-            enchant.Label.call(this, "0 匹")
+            enchant.Label.call(this, "0")
             this.num = 0
-            this.x = GAME_WIDTH - 50
+            this.x = 30
             this.y = 10
             game.rootScene.addChild(this)
         gain: ->
             this.num++
-            this.text = "#{this.num} 匹"
+            this.text = "#{this.num}"
 
     # game のセットアップ
 
@@ -160,6 +187,8 @@ window.onload = ->
     # 画像のロード
     for img in lio_imgs
         game.preload img.url,
+    game.preload "img/sun.png"
+    game.preload "img/cloud.png"
 
     game_over = ->
         game_is_over = true
@@ -168,6 +197,8 @@ window.onload = ->
 
     game.onload = ->
         world = new PhysicsWorld 0.0, GRAVITY
+        new Sun
+        new Cloud
         new Floor
         score = new Score
 
