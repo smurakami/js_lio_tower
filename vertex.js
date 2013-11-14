@@ -7,11 +7,11 @@
   exports = this;
 
   window.onload = function() {
-    var BOUNCE, Floor, GAME_HEIGHT, GAME_WIDTH, GRAVITY, LIO_DEFAULT_Y, Lio, game, img, lio, lio_imgs, _i, _len;
+    var BOUNCE, Floor, GAME_HEIGHT, GAME_WIDTH, GRAVITY, LIO_DEFAULT_Y, Lio, Vertex, game, img, lio, lio_imgs, vertex, _i, _len;
     GAME_WIDTH = 320;
     GAME_HEIGHT = 320;
     GRAVITY = 20;
-    BOUNCE = 0.01;
+    BOUNCE = 0.30;
     LIO_DEFAULT_Y = 20;
     lio = null;
     lio_imgs = [
@@ -21,6 +21,7 @@
         url: "img/lio00.png"
       }
     ];
+    vertex = [];
     Lio = enchant.Class.create(PhyBoxSprite, {
       initialize: function(x, y) {
         var img, img_num;
@@ -32,53 +33,111 @@
         }
         img_num = 0;
         img = lio_imgs[img_num];
-        PhyBoxSprite.call(this, img.width, img.height, enchant.box2d.DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, false);
+        PhyBoxSprite.call(this, img.width, img.height, STATIC_SPRITE, 1.0, 1.0, BOUNCE, false);
         this.image = game.assets[img.url];
         this.position = {
           x: x,
           y: y
         };
-        return game.rootScene.addChild(this);
+        this.center = new Sprite(2, 2);
+        this.center.backgroundColor = "blue";
+        this.center.x = this.x + this.width / 2;
+        this.center.y = this.y + this.height / 2;
+        this.addEventListener('touchstart', function(e) {
+          new Vertex(e.x, e.y);
+          return vertex.push({
+            x: e.x,
+            y: e.y
+          });
+        });
+        game.rootScene.addChild(this);
+        return game.rootScene.addChild(this.center);
       },
       update: function() {}
     });
     Floor = enchant.Class.create(PhyBoxSprite, {
       initialize: function() {
-        PhyBoxSprite.call(this, GAME_WIDTH - 20, 20, enchant.box2d.STATIC_SPRITE, 1.0, 1.0, 0.0, true);
+        PhyBoxSprite.call(this, GAME_WIDTH - 20, 20, STATIC_SPRITE, 1.0, 1.0, 0.0, true);
         this.x = 10;
         this.y = GAME_HEIGHT - this.height;
         this.backgroundColor = "green";
         return game.rootScene.addChild(this);
       }
     });
+    Vertex = enchant.Class.create(enchant.Sprite, {
+      initialize: function(x, y) {
+        enchant.Sprite.call(this, 2, 2);
+        this.x = x - 1;
+        this.y = y - 1;
+        this.backgroundColor = "red";
+        return game.rootScene.addChild(this);
+      }
+    });
     game = enchant.Core(GAME_WIDTH, GAME_HEIGHT);
-    game.fps = 30;
+    game.fps = 60;
     game.rootScene.backgroundColor = "aqua";
     for (_i = 0, _len = lio_imgs.length; _i < _len; _i++) {
       img = lio_imgs[_i];
       game.preload(img.url);
     }
+    exports.radian = function(v) {
+      var theta, x, y;
+      x = v.x - lio.position.x;
+      y = v.y - lio.position.y;
+      if (x === 0) {
+        if (y >= 0) {
+          return Math.PI;
+        } else {
+          return 3 * Math.PI;
+        }
+      } else {
+        theta = Math.atan(y / x);
+        if (y < 0) {
+          if (x < 0) {
+            theta += Math.PI;
+          } else {
+            theta += 2 * Math.PI;
+          }
+        } else if (x < 0) {
+          theta += Math.PI;
+        }
+      }
+      return theta;
+    };
     game.onload = function() {
-      var world;
+      var button, world;
       world = new PhysicsWorld(0.0, GRAVITY);
       new Floor;
-      game.rootScene.addEventListener('touchstart', function(e) {
-        return exports.lio = new Lio(e.x, LIO_DEFAULT_Y);
-      });
-      game.rootScene.addEventListener('touchmove', function(e) {
-        if (exports.lio == null) {
-          return;
+      lio = new Lio(GAME_WIDTH / 2, GAME_HEIGHT / 2);
+      button = new Sprite(20, 20);
+      button.x = 10;
+      button.y = 10;
+      button.backgroundColor = "red";
+      game.rootScene.addChild(button);
+      button.addEventListener('touchstart', function() {
+        var s, v, x, y, _j, _k, _len1, _len2;
+        vertex.sort(function(a, b) {
+          if (radian(a) < radian(b)) {
+            return -1;
+          } else {
+            return 1;
+          }
+        });
+        s = "";
+        for (_j = 0, _len1 = vertex.length; _j < _len1; _j++) {
+          v = vertex[_j];
+          s += "" + (radian(v)) + "\n";
         }
-        return exports.lio.position = {
-          x: e.x,
-          y: exports.lio_DEFAULT_Y
-        };
-      });
-      game.rootScene.addEventListener('touchend', function() {
-        if (exports.lio == null) {
-          return;
+        console.log(s);
+        s = "[\n";
+        for (_k = 0, _len2 = vertex.length; _k < _len2; _k++) {
+          v = vertex[_k];
+          x = v.x - lio.position.x;
+          y = v.y - lio.position.y;
+          s += "    {x:" + x + ", y:" + y + "},\n";
         }
-        return exports.lio.setAwake(true);
+        s += "]";
+        return console.log(s);
       });
       return game.rootScene.onenterframe = function(e) {
         return world.step(game.fps);

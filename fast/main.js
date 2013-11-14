@@ -7,11 +7,11 @@
   exports = this;
 
   window.onload = function() {
-    var BOUNCE, Floor, GAME_HEIGHT, GAME_WIDTH, GRAVITY, LIO_DEFAULT_Y, Lio, game, img, lio, lio_imgs, lio_vertex, _i, _len;
+    var BOUNCE, Floor, GAME_HEIGHT, GAME_WIDTH, GRAVITY, LIO_DEFAULT_Y, Lio, game, img, lio, lio_imgs, _i, _len;
     GAME_WIDTH = 320;
     GAME_HEIGHT = 320;
     GRAVITY = 20;
-    BOUNCE = 0.30;
+    BOUNCE = 0.01;
     LIO_DEFAULT_Y = 20;
     lio = null;
     lio_imgs = [
@@ -21,47 +21,18 @@
         url: "img/lio00.png"
       }
     ];
-    lio_vertex = [
-      [
-        {
-          x: 20.281690140845086,
-          y: 15.774647887323965
-        }, {
-          x: -4.507042253521121,
-          y: 22.535211267605632
-        }, {
-          x: -36.05633802816901,
-          y: -2.253521126760546
-        }, {
-          x: -31.549295774647874,
-          y: -20.281690140845058
-        }, {
-          x: 4.507042253521149,
-          y: -20.281690140845058
-        }, {
-          x: 20.281690140845086,
-          y: -11.267605633802816
-        }
-      ]
-    ];
-    Lio = enchant.Class.create(PhyPolygonSprite, {
+    Lio = enchant.Class.create(PhyBoxSprite, {
       initialize: function(x, y) {
-        var img, lio_num, v, vertex, _i, _len, _ref;
+        var img, img_num;
         if (x == null) {
           x = GAME_WIDTH / 2;
         }
         if (y == null) {
           y = GAME_HEIGHT / 2;
         }
-        lio_num = 0;
-        img = lio_imgs[lio_num];
-        vertex = [];
-        _ref = lio_vertex[lio_num];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          v = _ref[_i];
-          vertex.push(new b2Vec2(v.x, v.y));
-        }
-        PhyPolygonSprite.call(this, img.width, img.height, vertex, DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, false);
+        img_num = 0;
+        img = lio_imgs[img_num];
+        PhyBoxSprite.call(this, img.width, img.height, enchant.box2d.DYNAMIC_SPRITE, 1.0, 1.0, BOUNCE, false);
         this.image = game.assets[img.url];
         this.position = {
           x: x,
@@ -73,7 +44,7 @@
     });
     Floor = enchant.Class.create(PhyBoxSprite, {
       initialize: function() {
-        PhyBoxSprite.call(this, GAME_WIDTH - 20, 20, STATIC_SPRITE, 1.0, 1.0, 0.0, true);
+        PhyBoxSprite.call(this, GAME_WIDTH - 20, 20, enchant.box2d.STATIC_SPRITE, 1.0, 1.0, 0.0, true);
         this.x = 10;
         this.y = GAME_HEIGHT - this.height;
         this.backgroundColor = "green";
@@ -81,29 +52,16 @@
       }
     });
     game = enchant.Core(GAME_WIDTH, GAME_HEIGHT);
-    game.fps = 60;
+    game.fps = 30;
     game.rootScene.backgroundColor = "aqua";
     for (_i = 0, _len = lio_imgs.length; _i < _len; _i++) {
       img = lio_imgs[_i];
       game.preload(img.url);
     }
     game.onload = function() {
-      var i, phyPolygonSprite, radius, vertexCount, vertexs, world, _j;
+      var world;
       world = new PhysicsWorld(0.0, GRAVITY);
       new Floor;
-      vertexCount = 6;
-      radius = 20;
-      vertexs = new Array();
-      for (i = _j = 0; 0 <= vertexCount ? _j < vertexCount : _j > vertexCount; i = 0 <= vertexCount ? ++_j : --_j) {
-        vertexs[i] = new b2Vec2(radius * Math.cos(2 * Math.PI / vertexCount * i), radius * Math.sin(2 * Math.PI / vertexCount * i));
-      }
-      phyPolygonSprite = new PhyPolygonSprite(radius * 2, radius * 2, vertexs, DYNAMIC_SPRITE, 1.0, 0.1, 0.2, true);
-      phyPolygonSprite.position = {
-        x: game.width / 3,
-        y: 0
-      };
-      game.rootScene.addChild(phyPolygonSprite);
-      new Lio;
       game.rootScene.addEventListener('touchstart', function(e) {
         return exports.lio = new Lio(e.x, LIO_DEFAULT_Y);
       });
@@ -113,7 +71,7 @@
         }
         return exports.lio.position = {
           x: e.x,
-          y: LIO_DEFAULT_Y
+          y: exports.lio_DEFAULT_Y
         };
       });
       game.rootScene.addEventListener('touchend', function() {
