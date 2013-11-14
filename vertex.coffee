@@ -11,16 +11,21 @@ window.onload = ->
 
 
     lio_imgs = [
-        width: 80
-        height: 50
-        url: "img/lio00.png"
-    ,]
+        { width: 80, height: 50,  url: "img/lio00.png" },
+        { width: 35, height: 50,  url: "img/lio01.png" },
+        { width: 52, height: 50,  url: "img/lio02.png" },
+        { width: 56, height: 50,  url: "img/lio03.png" },
+        { width: 77, height: 50,  url: "img/lio04.png" },
+        { width: 56, height: 60,  url: "img/lio05.png" },
+        { width: 59, height: 50,  url: "img/lio06.png" },
+        { width: 69, height: 60,  url: "img/lio07.png" },
+    ]
 
     vertex = []
 
     Lio = enchant.Class.create PhyBoxSprite,
         initialize: (x = GAME_WIDTH / 2, y = GAME_HEIGHT / 2) ->
-            img_num = 0
+            img_num = 5
             img = lio_imgs[img_num]
             PhyBoxSprite.call this,img.width , img.height, STATIC_SPRITE, 1.0, 1.0, BOUNCE, no
 
